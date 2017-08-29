@@ -8,6 +8,7 @@ import static org.junit.Assert.assertTrue;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.MalformedURLException;
@@ -20,10 +21,11 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 
 import org.apache.kafka.connect.data.Struct;
-import org.apache.kafka.connect.source.SourceRecord;
 import org.apache.kafka.connect.json.JsonConverter;
+import org.apache.kafka.connect.source.SourceRecord;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -43,19 +45,27 @@ public class SolaceSourceTaskTest implements Runnable {
 	 */
     @Before
     public void setup() {
+    	
+    	Properties prop = new Properties();
+    	InputStream inputStream = getClass().getClassLoader().getResourceAsStream("unit_test.properties"); 
+    	try {
+    	    prop.load(inputStream);	
+    	} catch (IOException e) {
+    	    e.printStackTrace();
+    	}
     	config = new HashMap<String, String>();
-    	config.put(SolaceConnectorConstants.SOLACE_URL, "mr-6727eibfb.datago_ecb2-messaging.datago.io:21184");
-    	config.put(SolaceConnectorConstants.SOLACE_VPN, "msgvpn-6727f5gdp");
-    	config.put(SolaceConnectorConstants.SOLACE_USERNAME, "datago-client-username");
-    	config.put(SolaceConnectorConstants.SOLACE_PASSWORD, "u7n7f2ddt3hia005fo29uli64f");
-    	config.put(SolaceConnectorConstants.SOLACE_TOPIC, "test/>");
+    	config.put(SolaceConnectorConstants.SOLACE_URL, prop.getProperty(SolaceConnectorConstants.SOLACE_URL));
+    	config.put(SolaceConnectorConstants.SOLACE_VPN, prop.getProperty(SolaceConnectorConstants.SOLACE_VPN));
+    	config.put(SolaceConnectorConstants.SOLACE_USERNAME, prop.getProperty(SolaceConnectorConstants.SOLACE_USERNAME));
+    	config.put(SolaceConnectorConstants.SOLACE_PASSWORD, prop.getProperty(SolaceConnectorConstants.SOLACE_PASSWORD));
+    	config.put(SolaceConnectorConstants.SOLACE_TOPIC, prop.getProperty(SolaceConnectorConstants.SOLACE_TOPIC));
     	config.put(SolaceConnectorConstants.KAFKA_TOPIC, "solace_topic");
     	config.put(SolaceConnectorConstants.LONG_POLL_INTERVAL, "100");
     	config.put(SolaceConnectorConstants.SHORT_POLL_INTERVAL, "1");
     	config.put(SolaceConnectorConstants.POLL_BATCH_SIZE, "10");
 
     	// Only used in testing to send messages to Solace
-    	config.put("REST_URL", "http://mr-6727eibfb.datago_ecb2-messaging.datago.io:21194");
+    	config.put("REST_URL", prop.getProperty("REST_URL"));
     }
     private static final String SCHEMAS_ENABLE_CONFIG = "schemas.enable";
     private static final String SCHEMAS_CACHE_SIZE_CONFIG = "schemas.cache.size";
