@@ -1,8 +1,6 @@
 apply plugin: 'java'
 apply plugin: 'eclipse'
-apply plugin: 'application'
 
-applicationName = 'solace-kafka-source'
 version = '0.1'
 
 jar {
@@ -19,9 +17,6 @@ repositories {
 }
 
 dependencies {
-	// Solace Messaging API for Java Dependencies
-	compile("com.solacesystems:sol-jcsmp:10.+")
-    
 	// https://mvnrepository.com/artifact/org.apache.kafka/connect-api
 	compile group: 'org.apache.kafka', name: 'connect-api', version: '0.11.0.0'   
 	
@@ -39,4 +34,11 @@ dependencies {
 
 	// https://mvnrepository.com/artifact/junit/junit
 	testCompile group: 'junit', name: 'junit', version: '4.12'
+
+	// https://mvnrepository.com/artifact/org.apache.kafka/connect-json
+	testCompile group: 'org.apache.kafka', name: 'connect-json', version: '0.11.0.0'
+
+	// Solace Messaging API for Java Dependencies
+	compile("com.solacesystems:sol-jcsmp:10.+")
+
 }
