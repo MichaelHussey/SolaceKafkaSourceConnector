@@ -68,7 +68,7 @@ Both Gradle and Maven create `target/solace_kafka_source-0.1.jar` and also copy 
 
 ### Deploying the Connector into Kafka
 
-The simplest way to copy the jar file created above together with the required dependencies to a directory which is contained in the Kafka environment's `plugin.path` [See docs for the Confluent Platform](http://docs.confluent.io/current/connect/userguide.html#installing-plugins). A conenvience Gradle task `copyDepJars` copies all the connector-specific dependencies to the `target/deplib` directory.
+The simplest way to copy the jar file created above together with the required dependencies to a directory which is contained in the Kafka environment's `plugin.path` [See docs for the Confluent Platform](http://docs.confluent.io/current/connect/userguide.html#installing-plugins). 
 
 ```
 export SOLACE_KAFKA_PLUGIN=${CONFLUENT_HOME}/share/java/kafka-connect-solace
@@ -112,10 +112,10 @@ bin/kafka-console-consumer --bootstrap-server localhost:9092 --topic solace_topi
 Now send some messages to a matching Solace topic - for example using the [SDKPerf](http://dev.solace.com/downloads/download_sdkperf/) tool
 
 ```
-bin/kafka-console-consumer --bootstrap-server localhost:9092 --topic solace_topic --from-beginning
+command for sdkperf goes here
 ```
 
-## Deployment
+## Architecture of the Connector
 
 Add additional notes about how to deploy this on a live system
 
@@ -130,8 +130,6 @@ Add additional notes about how to deploy this on a live system
 ## Authors
 
 * **Mic Hussey** - *Initial work* - [Solace](https://github.com/MichaelHussey)
-
-See also the list of [contributors](https://github.com/your/project/contributors) who participated in this project.
 
 ## License
 
