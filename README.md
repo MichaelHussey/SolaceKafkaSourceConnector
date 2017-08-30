@@ -24,42 +24,95 @@ solace.topic    | The Solace topic to listen on. May contain wildcards, eg `test
 
 In order to successfully run the Unit Tests for the Connector you need to edit the `src/test/resources/unit_test.properties` file and provide the correct values for your environment.
 
-### Installing
+### Getting the source
 
 Grab a copy of the project using GIT from XXX
 
-Build using Gradle...
+If you want to easily import the source into Eclipse (in order to inspect or modify) there is a Gradle task which generates a .project file with correctly configured source and classpaths
 
 ```
-./gradlew build
+./gradlew eclipse
+```
+
+Then simply use `File | Import... | Existing Projects into Workspace` in the IDE
+
+## Building and testing
+
+Make sure that the `config/unit_test.properties` file is up-to-date.
+
+It's possible to just build the code and run the Unit Tests on their own - using Gradle...
+
+```
+./gradlew compile
+./gradlew test
 ```
 
 ...or using Maven
 
 ```
 mvn compile
+mvn test
 ```
 
-End with an example of getting some data out of the system or using it for a little demo
-
-## Running the tests
-
-Modify the file [`config/quickstart-solace_source.properties`]
-
-### Break down into end to end tests
-
-Explain what these tests test and why
+The Kafka Connect architecture requires a jar file which can be created in Gradle via
 
 ```
-Give an example
+./gradlew build
 ```
-
-### And coding style tests
-
-Explain what these tests test and why
+Note that this also runs the UnitTests. Just `./gradlew assemble` will create the jar file without running the tests. To run the unit tests and create the jar file in Maven use
 
 ```
-Give an example
+./mvn package
+```
+Both Gradle and Maven create `target/solace_kafka_source-0.1.jar` and also copy the run-time dependencies (except those provided by Kafka Connect itself) into `target/deplib/`
+
+### Deploying the Connector into Kafka
+
+The simplest way to copy the jar file created above together with the required dependencies to a directory which is contained in the Kafka environment's `plugin.path` [See docs for the Confluent Platform](http://docs.confluent.io/current/connect/userguide.html#installing-plugins). A conenvience Gradle task `copyDepJars` copies all the connector-specific dependencies to the `target/deplib` directory.
+
+```
+export SOLACE_KAFKA_PLUGIN=${CONFLUENT_HOME}/share/java/kafka-connect-solace
+mkdir ${SOLACE_KAFKA_PLUGIN}
+cp target/solace_kafka_source-0.1.jar ${SOLACE_KAFKA_PLUGIN}/
+cp target/deplib/* ${SOLACE_KAFKA_PLUGIN}/
+```
+
+### Starting the connector
+
+First start the Kafka environment. For the purposes of testing a stand-alone [Confluent](https://www.confluent.io/download/) install is sufficient. In different consoles start ZooKeeper
+
+```
+cd ${CONFLUENT_HOME}
+bin/zookeeper-server-start etc/kafka/zookeeper.properties
+```
+and a Kafka Server
+
+```
+cd ${CONFLUENT_HOME}
+bin/kafka-server-start etc/kafka/server.properties
+```
+Now edit the `config/quickstart-solace_source.properties` and set the Solace parameters to point to your message router. Create a topic to receive the data coming from Solace (the name of the topic should be the same as {topic} in the properties file.
+
+```
+cd ${CONFLUENT_HOME}
+bin/kafka-topics  --create --zookeeper localhost:2181 --replication-factor 1 --partitions 1 --topic solace_topic
+```
+ Then start the connector in stand-alone mode.
+
+```
+cd ${CONFLUENT_HOME}
+bin/connect-standalone etc/kafka/connect-standalone.properties ${PROJECT_DIR}/config/quickstart-solace_source.properties
+```
+You can monitor what data is sent to Kafka using a console listener
+
+```
+bin/kafka-console-consumer --bootstrap-server localhost:9092 --topic solace_topic --from-beginning
+```
+
+Now send some messages to a matching Solace topic - for example using the [SDKPerf](http://dev.solace.com/downloads/download_sdkperf/) tool
+
+```
+bin/kafka-console-consumer --bootstrap-server localhost:9092 --topic solace_topic --from-beginning
 ```
 
 ## Deployment
@@ -73,12 +126,6 @@ Add additional notes about how to deploy this on a live system
 * [ROME](https://rometools.github.io/rome/) - Used to generate RSS Feeds
 
 ## Contributing
-
-Please read [CONTRIBUTING.md](https://gist.github.com/PurpleBooth/b24679402957c63ec426) for details on our code of conduct, and the process for submitting pull requests to us.
-
-## Versioning
-
-We use [SemVer](http://semver.org/) for versioning. For the versions available, see the [tags on this repository](https://github.com/your/project/tags). 
 
 ## Authors
 

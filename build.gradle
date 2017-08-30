@@ -1,16 +1,27 @@
 apply plugin: 'java'
 apply plugin: 'eclipse'
+apply plugin: 'idea'
 
 version = '0.1'
+project.buildDir = 'target'
 
 jar {
-    baseName = 'solace-kafka-source'
+    baseName = 'solace_kafka_source'
     version =  version
     manifest {
         attributes 'Implementation-Title': 'Solace Kafka Source',
                    'Implementation-Version': version
     }
+    destinationDir = file("target")
 }
+task copyDepJars(type: Copy) {
+  from configurations.compile
+  into 'target/deplib'
+  // We shouldn't include the Kafka Connect libraries
+  exclude 'kafka-clients*'
+  exclude 'connect-api*'
+}
+assemble.dependsOn copyDepJars
 
 repositories {
     mavenCentral()
