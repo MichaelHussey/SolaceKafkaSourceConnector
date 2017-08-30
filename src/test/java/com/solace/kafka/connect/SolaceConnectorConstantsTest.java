@@ -13,4 +13,10 @@ public class SolaceConnectorConstantsTest {
 		assertEquals(SolaceConnectorConstants.DataType.MAP.getValue(),"map");
 	}
 
+	@Test
+	public void test1() {
+		assertEquals(SolaceConnectorConstants.CONNECTOR_NAME,"solace_kafka_source");
+		assertEquals(SolaceConnectorConstants.CONNECTOR_VERSION,"0.1");
+	}
+
 }

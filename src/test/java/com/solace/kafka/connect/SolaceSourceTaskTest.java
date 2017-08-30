@@ -35,7 +35,7 @@ import org.junit.Test;
  */
 public class SolaceSourceTaskTest implements Runnable {
 	
-	Map<String, String> config;
+	Properties config;
 	private SolaceSourceTask task;
 
 	/**
@@ -53,6 +53,8 @@ public class SolaceSourceTaskTest implements Runnable {
     	} catch (IOException e) {
     	    e.printStackTrace();
     	}
+    	config = prop;
+    	/**
     	config = new HashMap<String, String>();
     	config.put(SolaceConnectorConstants.SOLACE_URL, prop.getProperty(SolaceConnectorConstants.SOLACE_URL));
     	config.put(SolaceConnectorConstants.SOLACE_VPN, prop.getProperty(SolaceConnectorConstants.SOLACE_VPN));
@@ -66,14 +68,17 @@ public class SolaceSourceTaskTest implements Runnable {
 
     	// Only used in testing to send messages to Solace
     	config.put("REST_URL", prop.getProperty("REST_URL"));
+    	*/
     }
     private static final String SCHEMAS_ENABLE_CONFIG = "schemas.enable";
     private static final String SCHEMAS_CACHE_SIZE_CONFIG = "schemas.cache.size";
+    
+	@SuppressWarnings("unchecked")
 	@Test
 	public void test() {
 		SolaceSourceTask task = new SolaceSourceTask();
 		List<SourceRecord> records = new ArrayList<SourceRecord>();
-		task.start(config);
+		task.start((Map)config);
 		
 		try {
 			
@@ -97,12 +102,27 @@ public class SolaceSourceTaskTest implements Runnable {
 		cc.put(SCHEMAS_CACHE_SIZE_CONFIG,"10");
 		converter.configure(cc, false);
 		
-		byte[] jsonData = converter.fromConnectData(config.get(SolaceConnectorConstants.KAFKA_TOPIC), records.get(0).valueSchema(), records.get(0).value());
+		byte[] jsonData = converter.fromConnectData((String)config.get(SolaceConnectorConstants.KAFKA_TOPIC), records.get(0).valueSchema(), records.get(0).value());
 
 		assertTrue(jsonData.length > 0);
 		
 		System.err.println("JSON data: "+new String(jsonData));
 	}
+	
+	/**
+	 * Check that the optional properties defaults are being correctly picked up even though they aren't
+	 * set in the properties file
+	 */
+	@SuppressWarnings("unchecked")
+	@Test
+	public void testDefaultProperties() {	
+		SolaceSourceTask task = new SolaceSourceTask();
+		task.setParameters((Map)config);
+		
+		assertEquals(task.reconnectRetries, SolaceConnectorConstants.DEFAULT_SOLACE_RECONNECT_RETRIES);
+		assertEquals(task.reconnectRetryWaitInMillis, SolaceConnectorConstants.DEFAULT_SOLACE_RECONNECT_RETRY_WAIT);
+	}
+
 	
 	/**
 	 * @throws IOException 
@@ -156,13 +176,14 @@ public class SolaceSourceTaskTest implements Runnable {
 	 * To make debugging easier
 	 * @param args
 	 */
+	@SuppressWarnings("unchecked")
 	public static void main(String[] args)
 	{
 		SolaceSourceTask task = new SolaceSourceTask();
 		SolaceSourceTaskTest tester = new SolaceSourceTaskTest();
 		tester.setup();
 		tester.task = task;
-		task.start(tester.config);
+		task.start((Map)tester.config);
 		
 		(new Thread(tester)).start();
 	}

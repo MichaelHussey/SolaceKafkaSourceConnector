@@ -31,13 +31,12 @@ public class SolaceSourceConnector extends SourceConnector {
 		connectorProperties = propMap;
 
 		String topicName = propMap.get(SolaceConnectorConstants.SOLACE_TOPIC);
-		String[] listenTopicNames = topicName.split("'");
 				
 		// TODO - validate the config here, using SolaceConfigDef?
 		if (topicName == null || topicName.isEmpty())
             throw new ConnectException("SolaceSourceConnector missing required parameter '"+SolaceConnectorConstants.SOLACE_TOPIC+"'");
 
-		log.info("Solace Kafka Source connector started. Listening to "+listenTopicNames.length+" Solace topics. "+topicName);
+		log.info("Solace Kafka Source connector started. Listening to Solace topic: "+topicName);
 	}
 
 	@Override
@@ -46,7 +45,6 @@ public class SolaceSourceConnector extends SourceConnector {
 
 	@Override
 	public Class<? extends Task> taskClass() {
-		// TODO Auto-generated method stub
 		return SolaceSourceTask.class;
 	}
 

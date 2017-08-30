@@ -14,11 +14,13 @@ import org.slf4j.LoggerFactory;
 import com.solacesystems.jcsmp.JCSMPException;
 import com.solacesystems.jcsmp.JCSMPFactory;
 import com.solacesystems.jcsmp.JCSMPProperties;
+import com.solacesystems.jcsmp.JCSMPReconnectEventHandler;
 import com.solacesystems.jcsmp.JCSMPSession;
 import com.solacesystems.jcsmp.Topic;
 import com.solacesystems.jcsmp.XMLMessageConsumer;
 import com.solacesystems.jcsmp.XMLMessageListener;
 import com.solacesystems.jcsmp.BytesXMLMessage;
+import com.solacesystems.jcsmp.JCSMPChannelProperties;
 
 public class SolaceSourceTask extends SourceTask {
 
@@ -34,11 +36,21 @@ public class SolaceSourceTask extends SourceTask {
 	protected String clientPassword;
 	protected String solaceTopicName;
 	protected String kafkaTopicName;
-	protected int longPollInterval = 1000;
-	protected int shortPollInterval = 10;
-	protected int kafkaBufferSize = 100;
+	protected int longPollInterval = SolaceConnectorConstants.DEFAULT_LONG_POLL_INTERVAL;
+	protected int shortPollInterval = SolaceConnectorConstants.DEFAULT_SHORT_POLL_INTERVAL;
+	protected int kafkaBufferSize = SolaceConnectorConstants.DEFAULT_POLL_BATCH_SIZE;
 	
 	protected SolaceConverter converter;
+
+	protected int reconnectRetries;
+
+	protected int connectTimeoutInMillis;
+
+	protected int connectRetriesPerHost;
+
+	protected int keepAliveIntervalInMillis;
+
+	protected int reconnectRetryWaitInMillis;
 	
 	@Override
 	public String version() {
@@ -84,20 +96,8 @@ public class SolaceSourceTask extends SourceTask {
 
 	@Override
 	public void start(Map<String, String> propMap) {
-		// Pull the parameters needed to connect to the Message Router
-		smfHost = propMap.get(SolaceConnectorConstants.SOLACE_URL);
-		msgVpnName  = propMap.get(SolaceConnectorConstants.SOLACE_VPN);
-		clientUsername = propMap.get(SolaceConnectorConstants.SOLACE_USERNAME);
-		clientPassword = propMap.get(SolaceConnectorConstants.SOLACE_PASSWORD);
-		kafkaTopicName = propMap.get(SolaceConnectorConstants.KAFKA_TOPIC);
-		solaceTopicName = propMap.get(SolaceConnectorConstants.SOLACE_TOPIC);
-		longPollInterval = Integer.parseInt(propMap.get(SolaceConnectorConstants.LONG_POLL_INTERVAL));
-		shortPollInterval = Integer.parseInt(propMap.get(SolaceConnectorConstants.SHORT_POLL_INTERVAL));
-		kafkaBufferSize = Integer.parseInt(propMap.get(SolaceConnectorConstants.POLL_BATCH_SIZE));
 
-		// TODO - validate the config here, using SolaceConfigDef?
-		if (kafkaTopicName == null || kafkaTopicName.isEmpty())
-            throw new ConnectException("SolaceSourceConnector missing required parameter '"+SolaceConnectorConstants.KAFKA_TOPIC+"'");
+		setParameters(propMap);
 
 		log.info("Solace Kafka Source connector started. Will connect to router at url:"
 				+smfHost+" vpn:"+msgVpnName+" user:"+clientUsername+" pass:"+clientPassword
@@ -124,6 +124,25 @@ public class SolaceSourceTask extends SourceTask {
             throw new ConnectException("SolaceSourceTask failed to start listener.", e);
 		}
 	}
+	
+	protected void setParameters(Map<String, String> propMap)
+	{
+		// Pull the parameters needed to connect to the Message Router
+		Map<String, Object> parsedMap = SolaceConfigDef.defaultConfig().parse(propMap);
+		
+		smfHost = (String) parsedMap.get(SolaceConnectorConstants.SOLACE_URL);
+		msgVpnName  = (String) parsedMap.get(SolaceConnectorConstants.SOLACE_VPN);
+		clientUsername = (String) parsedMap.get(SolaceConnectorConstants.SOLACE_USERNAME);
+		clientPassword = (String) parsedMap.get(SolaceConnectorConstants.SOLACE_PASSWORD);
+		kafkaTopicName = (String) parsedMap.get(SolaceConnectorConstants.KAFKA_TOPIC);
+		solaceTopicName = (String) parsedMap.get(SolaceConnectorConstants.SOLACE_TOPIC);
+		longPollInterval = (int) parsedMap.get(SolaceConnectorConstants.LONG_POLL_INTERVAL);
+		shortPollInterval = (int) parsedMap.get(SolaceConnectorConstants.SHORT_POLL_INTERVAL);
+		kafkaBufferSize = (int) parsedMap.get(SolaceConnectorConstants.POLL_BATCH_SIZE);
+		reconnectRetries =  (int) parsedMap.get(SolaceConnectorConstants.SOLACE_RECONNECT_RETRIES);
+		reconnectRetryWaitInMillis = (int) parsedMap.get(SolaceConnectorConstants.SOLACE_RECONNECT_RETRY_WAIT);
+		
+	}
 
 	@Override
 	public void stop() {
@@ -140,11 +159,25 @@ public class SolaceSourceTask extends SourceTask {
         {
             properties.setProperty(JCSMPProperties.PASSWORD, clientPassword);
         }
+        properties.setProperty(JCSMPProperties.APPLICATION_DESCRIPTION, 
+        		SolaceConnectorConstants.CONNECTOR_NAME+" Version "+SolaceConnectorConstants.CONNECTOR_VERSION);
+        
+        // Settings for automatic reconnection to Solace Router
+        JCSMPChannelProperties channelProps = (JCSMPChannelProperties) properties.getProperty(JCSMPProperties.CLIENT_CHANNEL_PROPERTIES);
+        channelProps.setReconnectRetries(reconnectRetries);
+        channelProps.setReconnectRetryWaitInMillis(reconnectRetryWaitInMillis);
+        channelProps.setConnectTimeoutInMillis(connectTimeoutInMillis);
+        channelProps.setConnectRetriesPerHost(connectRetriesPerHost);
+        channelProps.setKeepAliveIntervalInMillis(keepAliveIntervalInMillis);
+        
+        properties.setProperty(JCSMPProperties.CLIENT_CHANNEL_PROPERTIES, channelProps);
+        
+        
         log.info("Connecting to Solace Message Router...");
         topic = JCSMPFactory.onlyInstance().createTopic(solaceTopicName);
 		session = JCSMPFactory.onlyInstance().createSession(properties);
         session.connect();		
         log.info("Connection succeeded!");
 		
-	}
+	}	
 }

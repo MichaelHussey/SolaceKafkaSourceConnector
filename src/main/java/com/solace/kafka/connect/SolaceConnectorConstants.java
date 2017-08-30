@@ -6,6 +6,9 @@ package com.solace.kafka.connect;
  *
  */
 public class SolaceConnectorConstants {
+	
+	public static final String CONNECTOR_NAME = "solace_kafka_source";
+	public static final String CONNECTOR_VERSION = "0.1";
 
 	public static final String SOLACE_VPN = "solace.msgVpn";
 	
@@ -17,13 +20,23 @@ public class SolaceConnectorConstants {
 	
 	public static final String SOLACE_TOPIC = "solace.topic";
 	
+	public static final String SOLACE_RECONNECT_RETRIES = "solace.reconnectRetries";
+	public static final int DEFAULT_SOLACE_RECONNECT_RETRIES = 5;
+	
+	public static final String SOLACE_RECONNECT_RETRY_WAIT = "solace.reconnectRetryWaitInMillis";
+	public static final int DEFAULT_SOLACE_RECONNECT_RETRY_WAIT = 5000;
+	
+	
 	public static final String KAFKA_TOPIC = "topic";
 	
 	public static final String LONG_POLL_INTERVAL = "polling.long_interval";
+	public static final int DEFAULT_LONG_POLL_INTERVAL = 1000;
 	
 	public static final String SHORT_POLL_INTERVAL = "polling.short_interval";
+	public static final int DEFAULT_SHORT_POLL_INTERVAL = 10;
 	
 	public static final String POLL_BATCH_SIZE = "polling.batch_size";
+	public static final int DEFAULT_POLL_BATCH_SIZE = 100;
 	
 
 	public static final String SCHEMA_NAME = "com.solace.kafka.message";
