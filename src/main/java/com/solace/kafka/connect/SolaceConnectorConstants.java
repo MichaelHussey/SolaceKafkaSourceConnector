@@ -21,11 +21,13 @@ public class SolaceConnectorConstants {
 	public static final String SOLACE_TOPIC = "solace.topic";
 	
 	public static final String SOLACE_RECONNECT_RETRIES = "solace.reconnectRetries";
-	public static final int DEFAULT_SOLACE_RECONNECT_RETRIES = 5;
+	public static final int DEFAULT_SOLACE_RECONNECT_RETRIES = 3;
 	
 	public static final String SOLACE_RECONNECT_RETRY_WAIT = "solace.reconnectRetryWaitInMillis";
-	public static final int DEFAULT_SOLACE_RECONNECT_RETRY_WAIT = 5000;
+	public static final int DEFAULT_SOLACE_RECONNECT_RETRY_WAIT = 3000;
 	
+	public static final String SOLACE_COMPRESSION_LEVEL = "solace.compressionLevel";
+	public static final int DEFAULT_SOLACE_COMPRESSION_LEVEL = 0;
 	
 	public static final String KAFKA_TOPIC = "topic";
 	

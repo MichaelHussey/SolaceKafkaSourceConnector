@@ -52,6 +52,7 @@ public class SolaceSourceTask extends SourceTask {
 
 	protected int reconnectRetryWaitInMillis;
 	
+	protected int compressionLevel;
 	@Override
 	public String version() {
         return AppInfoParser.getVersion();
@@ -141,7 +142,6 @@ public class SolaceSourceTask extends SourceTask {
 		kafkaBufferSize = (int) parsedMap.get(SolaceConnectorConstants.POLL_BATCH_SIZE);
 		reconnectRetries =  (int) parsedMap.get(SolaceConnectorConstants.SOLACE_RECONNECT_RETRIES);
 		reconnectRetryWaitInMillis = (int) parsedMap.get(SolaceConnectorConstants.SOLACE_RECONNECT_RETRY_WAIT);
-		
 	}
 
 	@Override

@@ -4,7 +4,9 @@ import java.util.Map;
 
 import org.apache.kafka.common.config.AbstractConfig;
 import org.apache.kafka.common.config.ConfigDef;
+import org.apache.kafka.common.config.ConfigDef.Range;
 import org.apache.kafka.common.config.ConfigDef.Type;
+import org.apache.kafka.common.config.ConfigDef.Validator;
 
 public class SolaceConfigDef extends AbstractConfig
 {
@@ -28,8 +30,17 @@ public class SolaceConfigDef extends AbstractConfig
 				SolaceConnectorConstants.DEFAULT_SOLACE_RECONNECT_RETRY_WAIT, 
 				ConfigDef.Importance.MEDIUM, 
 				"How much time in milliseconds to wait between each attempt to connect or reconnect to a host.");
+		defs.define(SolaceConnectorConstants.SOLACE_COMPRESSION_LEVEL, Type.INT, 
+				SolaceConnectorConstants.DEFAULT_SOLACE_COMPRESSION_LEVEL,
+				Range.between(0, 9),
+				ConfigDef.Importance.LOW, 
+				"A compressionLevel setting of 1-9 sets the ZLIB compression level to use; a setting of 0 disables compression entirely.");
 		
-		defs.define(SolaceConnectorConstants.KAFKA_TOPIC, Type.STRING, "solace_topic", ConfigDef.Importance.HIGH, "Destination Kafka topic");
+		defs.define(SolaceConnectorConstants.KAFKA_TOPIC, Type.STRING, 
+				"solace_topic",
+				ConfigDef.Importance.HIGH, 
+				"Destination Kafka topic");
+
 		defs.define(SolaceConnectorConstants.LONG_POLL_INTERVAL, Type.INT, 
 				SolaceConnectorConstants.DEFAULT_LONG_POLL_INTERVAL, 
 				ConfigDef.Importance.LOW, 

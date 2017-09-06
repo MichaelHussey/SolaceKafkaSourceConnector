@@ -8,7 +8,7 @@ These instructions will get you a copy of the project up and running on your loc
 
 ### Prerequisites
 
-You need both a Solace Message Router and a Kafka environment. 
+ZooKeeper and Kafka.You need both a Solace Message Router and a Kafka environment. 
 
 If you don't have a physical Solace Appliance available to you then use either a Virtual Message Router [VMR](http://dev.solace.com/downloads/) or register on [Solace's messaging as a service](https://datago.io).
 
@@ -117,15 +117,11 @@ command for sdkperf goes here
 
 ## Architecture of the Connector
 
-Add additional notes about how to deploy this on a live system
+This connector uses the Solace [Java API](http://docs.solace.com/Solace-Messaging-APIs/java-api-home.htm). 
 
-## Built With
+When a Task starts it connects to a Solace Message Router (Appliance, VMR or MAAS) and creates a topic subscription. The `solace.topic` property may contain *wildcards* so that the connector can listen to a subset of the topics in a multi-level topic hierarchy. See the [Solace Docs](http://docs.solace.com/Features/SMF-Topics.htm) for full details.
 
-* [Dropwizard](http://www.dropwizard.io/1.0.2/docs/) - The web framework used
-* [Maven](https://maven.apache.org/) - Dependency Management
-* [ROME](https://rometools.github.io/rome/) - Used to generate RSS Feeds
-
-## Contributing
+   and then uses the API in synchronous mode to retrieve messages which 
 
 ## Authors
 

@@ -24,9 +24,9 @@ public class SolaceConfigDefTest {
 			assertTrue(ce.getMessage().startsWith("Missing required configuration"));
 		}
 	}
-
-	@Test
-	public void testDefaults() {
+	
+	protected Properties readMinProperties()
+	{
     	Properties prop = new Properties();
     	InputStream inputStream = getClass().getClassLoader().getResourceAsStream("unit_test.properties"); 
     	try {
@@ -34,7 +34,12 @@ public class SolaceConfigDefTest {
     	} catch (IOException e) {
     	    e.printStackTrace();
     	}
-		
+    	return prop;
+	}
+
+	@Test
+	public void testDefaults() {
+		Properties prop = readMinProperties();
 		Map<String, Object> parsedMap = SolaceConfigDef.defaultConfig().parse(prop);
 		
 		Integer reconnectRetries = (Integer) parsedMap.get(SolaceConnectorConstants.SOLACE_RECONNECT_RETRIES);
@@ -42,6 +47,22 @@ public class SolaceConfigDefTest {
 		
 		Integer reconnectRetryWait = (Integer) parsedMap.get(SolaceConnectorConstants.SOLACE_RECONNECT_RETRY_WAIT);
 		assertEquals(reconnectRetryWait.intValue(), SolaceConnectorConstants.DEFAULT_SOLACE_RECONNECT_RETRY_WAIT);
+		
+		Integer compressLevel = (Integer) parsedMap.get(SolaceConnectorConstants.SOLACE_COMPRESSION_LEVEL);
+		assertEquals(compressLevel.intValue(), SolaceConnectorConstants.DEFAULT_SOLACE_COMPRESSION_LEVEL);
+	}
+
+	@Test
+	public void testInvalidCompression() {
+		Properties propMap = readMinProperties();
+		propMap.put(SolaceConnectorConstants.SOLACE_COMPRESSION_LEVEL, 10);
+		
+		try {
+			Map<String, Object> parsedMap = SolaceConfigDef.defaultConfig().parse(propMap);
+		} catch (ConfigException ce) {
+			ce.printStackTrace();
+			assertNotNull(ce);
+		}
 		
 	}
 
