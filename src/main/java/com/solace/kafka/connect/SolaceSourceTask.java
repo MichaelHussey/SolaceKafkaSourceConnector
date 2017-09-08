@@ -4,10 +4,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.kafka.common.config.ConfigDef;
+import org.apache.kafka.common.config.ConfigDef.Type;
 import org.apache.kafka.common.utils.AppInfoParser;
 import org.apache.kafka.connect.errors.ConnectException;
 import org.apache.kafka.connect.source.SourceRecord;
 import org.apache.kafka.connect.source.SourceTask;
+import org.apache.kafka.common.config.types.Password;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,6 +25,7 @@ import com.solacesystems.jcsmp.XMLMessageListener;
 import com.solacesystems.jcsmp.BytesXMLMessage;
 import com.solacesystems.jcsmp.JCSMPChannelProperties;
 
+
 public class SolaceSourceTask extends SourceTask {
 
 	private static final Logger log = LoggerFactory.getLogger(SolaceSourceTask.class);
@@ -33,7 +37,7 @@ public class SolaceSourceTask extends SourceTask {
 	protected String smfHost;
 	protected String msgVpnName;
 	protected String clientUsername;
-	protected String clientPassword;
+	protected Password clientPassword;
 	protected String solaceTopicName;
 	protected String kafkaTopicName;
 	protected int longPollInterval = SolaceConnectorConstants.DEFAULT_LONG_POLL_INTERVAL;
@@ -129,19 +133,20 @@ public class SolaceSourceTask extends SourceTask {
 	protected void setParameters(Map<String, String> propMap)
 	{
 		// Pull the parameters needed to connect to the Message Router
-		Map<String, Object> parsedMap = SolaceConfigDef.defaultConfig().parse(propMap);
+		//Map<String, Object> parsedMap = SolaceConfigDef.defaultConfig().parse(propMap);
+		SolaceConfigDef conf = new SolaceConfigDef(SolaceConfigDef.defaultConfig(), propMap);
 		
-		smfHost = (String) parsedMap.get(SolaceConnectorConstants.SOLACE_URL);
-		msgVpnName  = (String) parsedMap.get(SolaceConnectorConstants.SOLACE_VPN);
-		clientUsername = (String) parsedMap.get(SolaceConnectorConstants.SOLACE_USERNAME);
-		clientPassword = (String) parsedMap.get(SolaceConnectorConstants.SOLACE_PASSWORD);
-		kafkaTopicName = (String) parsedMap.get(SolaceConnectorConstants.KAFKA_TOPIC);
-		solaceTopicName = (String) parsedMap.get(SolaceConnectorConstants.SOLACE_TOPIC);
-		longPollInterval = (int) parsedMap.get(SolaceConnectorConstants.LONG_POLL_INTERVAL);
-		shortPollInterval = (int) parsedMap.get(SolaceConnectorConstants.SHORT_POLL_INTERVAL);
-		kafkaBufferSize = (int) parsedMap.get(SolaceConnectorConstants.POLL_BATCH_SIZE);
-		reconnectRetries =  (int) parsedMap.get(SolaceConnectorConstants.SOLACE_RECONNECT_RETRIES);
-		reconnectRetryWaitInMillis = (int) parsedMap.get(SolaceConnectorConstants.SOLACE_RECONNECT_RETRY_WAIT);
+		smfHost = conf.getString(SolaceConnectorConstants.SOLACE_URL);
+		msgVpnName  = conf.getString(SolaceConnectorConstants.SOLACE_VPN);
+		clientUsername = conf.getString(SolaceConnectorConstants.SOLACE_USERNAME);
+		clientPassword = conf.getPassword(SolaceConnectorConstants.SOLACE_PASSWORD);
+		kafkaTopicName = conf.getString(SolaceConnectorConstants.KAFKA_TOPIC);
+		solaceTopicName = conf.getString(SolaceConnectorConstants.SOLACE_TOPIC);
+		longPollInterval = conf.getInt(SolaceConnectorConstants.LONG_POLL_INTERVAL);
+		shortPollInterval = conf.getInt(SolaceConnectorConstants.SHORT_POLL_INTERVAL);
+		kafkaBufferSize = conf.getInt(SolaceConnectorConstants.POLL_BATCH_SIZE);
+		reconnectRetries =  conf.getInt(SolaceConnectorConstants.SOLACE_RECONNECT_RETRIES);
+		reconnectRetryWaitInMillis = conf.getInt(SolaceConnectorConstants.SOLACE_RECONNECT_RETRY_WAIT);
 	}
 
 	@Override
@@ -157,7 +162,7 @@ public class SolaceSourceTask extends SourceTask {
         properties.setProperty(JCSMPProperties.USERNAME, clientUsername);
         if (clientPassword != null)
         {
-            properties.setProperty(JCSMPProperties.PASSWORD, clientPassword);
+            properties.setProperty(JCSMPProperties.PASSWORD, clientPassword.value());
         }
         properties.setProperty(JCSMPProperties.APPLICATION_DESCRIPTION, 
         		SolaceConnectorConstants.CONNECTOR_NAME+" Version "+SolaceConnectorConstants.CONNECTOR_VERSION);

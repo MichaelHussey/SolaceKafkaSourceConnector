@@ -18,7 +18,7 @@ public class SolaceConfigDef extends AbstractConfig
 		defs.define(SolaceConnectorConstants.SOLACE_VPN, Type.STRING, "default", ConfigDef.Importance.MEDIUM, "Message VPN name");
 		defs.define(SolaceConnectorConstants.SOLACE_URL, Type.STRING, ConfigDef.Importance.HIGH, "Host and if necessary port number of the Solace Message Router, eg 'localhost:55555'");
 		defs.define(SolaceConnectorConstants.SOLACE_USERNAME, Type.STRING, "default", ConfigDef.Importance.MEDIUM, "Client Username");
-		defs.define(SolaceConnectorConstants.SOLACE_PASSWORD, Type.STRING, null, ConfigDef.Importance.MEDIUM, "Client Password, optional");
+		defs.define(SolaceConnectorConstants.SOLACE_PASSWORD, Type.PASSWORD, null, ConfigDef.Importance.MEDIUM, "Client Password, optional");
 		defs.define(SolaceConnectorConstants.SOLACE_TOPIC, Type.STRING, "default", ConfigDef.Importance.HIGH, "List of topics that are applied as subscriptions, comma separated");
 		// Reconnect related parameters
 		defs.define(SolaceConnectorConstants.SOLACE_RECONNECT_RETRIES, Type.INT, 
