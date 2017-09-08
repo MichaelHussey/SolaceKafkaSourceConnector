@@ -26,7 +26,7 @@ In order to successfully run the Unit Tests for the Connector you need to edit t
 
 ### Getting the source
 
-Grab a copy of the project using GIT from XXX
+Grab a copy of the project using `git clone` from  [GitHub](https://github.com/MichaelHussey/SolaceKafkaSourceConnector)
 
 If you want to easily import the source into Eclipse (in order to inspect or modify) there is a Gradle task which generates a .project file with correctly configured source and classpaths
 
@@ -109,19 +109,19 @@ You can monitor what data is sent to Kafka using a console listener
 bin/kafka-console-consumer --bootstrap-server localhost:9092 --topic solace_topic --from-beginning
 ```
 
-Now send some messages to a matching Solace topic - for example using the [SDKPerf](http://dev.solace.com/downloads/download_sdkperf/) tool
+Now send some messages to a matching Solace topic - for example using the [SDKPerf](http://dev.solace.com/downloads/download_sdkperf/) tool. The following command sends 10 messages to the topic `test/now`, at a rate of 100 messages per second with 1000 byte payloads
 
 ```
-command for sdkperf goes here
+./sdkperf_c -cip=192.168.56.98 -ptl=test/now -mn=10 -cp=client01 -cu=client01@demo_vpn -mr=100 -msa=1000
 ```
 
 ## Architecture of the Connector
 
 This connector uses the Solace [Java API](http://docs.solace.com/Solace-Messaging-APIs/java-api-home.htm). 
 
-When a Task starts it connects to a Solace Message Router (Appliance, VMR or MAAS) and creates a topic subscription. The `solace.topic` property may contain *wildcards* so that the connector can listen to a subset of the topics in a multi-level topic hierarchy. See the [Solace Docs](http://docs.solace.com/Features/SMF-Topics.htm) for full details.
+When a Task starts it connects to a Solace Message Router (Appliance, VMR or MAAS) and creates a topic subscription. The `solace.topic` property may contain *wildcards* so that the connector can listen to a subset of the topics in a multi-level topic hierarchy, for example subscribing to *test/>* will match all topics which start with the element *test*. A forward slash '/' is used as the separator in topic names. A single star '\*' matches any string in that position eg *test/foo\*/update* See the [Solace Docs](http://docs.solace.com/Features/SMF-Topics.htm) for full details.
 
-   and then uses the API in synchronous mode to retrieve messages which 
+The connector uses the API in synchronous mode to retrieve messages from the Solace Message Router. If no messages are available the connector's poll() method will block for `polling.long_interval` milliseconds. Once messages become available the connector assembles a vector of records containing `polling.batch_size` records which is passed to Kafka. If not enough messages to fill the vector are available and no further messages are received within `polling.short_interval` milliseconds the data is passed to Kafka in any case.
 
 ## Authors
 
