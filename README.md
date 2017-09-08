@@ -24,6 +24,8 @@ solace.topic    | The Solace topic to listen on. May contain wildcards, eg `test
 
 In order to successfully run the Unit Tests for the Connector you need to edit the `src/test/resources/unit_test.properties` file and provide the correct values for your environment.
 
+See [here](docs/source_config_options.rst) for a complete list of all configuration parameters used by the Connector. 
+
 ### Getting the source
 
 Grab a copy of the project using `git clone` from  [GitHub](https://github.com/MichaelHussey/SolaceKafkaSourceConnector)
