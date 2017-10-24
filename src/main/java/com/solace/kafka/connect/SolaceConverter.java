@@ -193,9 +193,6 @@ public class SolaceConverter{
 			kafkaStruct.put(SolaceConnectorConstants.FIELD_DATA_TYPE, SolaceConnectorConstants.DataType.BYTES.getValue());
 			kafkaStruct.put(SolaceConnectorConstants.FIELD_DATA_BYTES, data);
 		}
-		
-		System.err.println("Record: "+kafkaStruct);
-
 		return kafkaStruct;
 	}
 
