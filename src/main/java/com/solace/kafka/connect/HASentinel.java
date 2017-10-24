@@ -129,6 +129,9 @@ public class HASentinel implements XMLMessageListener, JCSMPStreamingPublishEven
 	
 	public void stop()  throws JCSMPException {
 		consumer.stop();
+		
+		// Send a HB so that the next member of the group can become active
+		sendHeartbeat();
 		isActiveMember = false;
 		isStopped = true;
 	}
