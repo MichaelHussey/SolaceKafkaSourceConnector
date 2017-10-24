@@ -134,7 +134,8 @@ In order to avoid this and have only a single task instance passing data to Kafk
 The name of the queue to use is set via the optional property ```solace.ha_sentinel_queue```. When this is set then the first task instance will become active (receive messages from Solace and pass them to Kafka). If the first task is stopped or dies the next will become active and so on.
 
 The connector attempts to provision the configured queue when it starts. This is only possible if the client profile used by the connector's identity has the "Guaranteed Endpoint Create" privilege.
-![](docs/images/GuaranteedEndpointCreate.png) 
+
+![Guaranteed Endpoint Create privilige in SolAdmin](docs/images/GuaranteedEndpointCreate.png) 
   
 The sentinel queue may of course also be created administratively in which case the identity used by the connector should be set to be the queue owner.
 
