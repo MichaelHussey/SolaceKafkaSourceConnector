@@ -39,6 +39,13 @@ Solace Connection Parameters
   * Default: default
   * Importance: high
 
+``solace.ha_sentinel_queue``
+  Name of Queue to use as High-Availability sentinel
+
+  * Type: string
+  * Default: null
+  * Importance: medium
+
 Solace Re-Connection Parameters
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -74,6 +81,13 @@ Connector Internal Behaviour
   * Default: solace_topic
   * Importance: high
 
+``connector.instance``
+  Unique identifier for the particular instance of the Connector Task. Should not be set in config file.
+
+  * Type: string
+  * Default: solace_kafka_source_0.1_0
+  * Importance: low
+
 ``polling.long_interval``
   How much time in milliseconds to wait when entering task.poll() method if there are no messages being received from Solace.
 
@@ -94,5 +108,3 @@ Connector Internal Behaviour
   * Type: int
   * Default: 10
   * Importance: low
-
-
