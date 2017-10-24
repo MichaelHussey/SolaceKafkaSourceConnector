@@ -4,7 +4,7 @@ A Kafka Connect *source* which listens to messages on a Solace topic and forward
 
 ## Getting Started
 
-These instructions will get you a copy of the project up and running on your local machine for development and testing purposes. See deployment for notes on how to deploy the project on a live system.
+These instructions will get you a copy of the project up and running on your local machine for development and testing purposes. See [deployment](#deployment) for notes on how to deploy the project on a live system.
 
 ### Prerequisites
 
@@ -68,7 +68,7 @@ Note that this also runs the UnitTests. Just `./gradlew assemble` will create th
 ```
 Both Gradle and Maven create `target/solace_kafka_source-0.1.jar` and also copy the run-time dependencies (except those provided by Kafka Connect itself) into `target/deplib/`
 
-### Deploying the Connector into Kafka
+### (#deployment) Deploying the Connector into Kafka
 
 The simplest way to copy the jar file created above together with the required dependencies to a directory which is contained in the Kafka environment's `plugin.path` [See docs for the Confluent Platform](http://docs.confluent.io/current/connect/userguide.html#installing-plugins). 
 
@@ -124,6 +124,19 @@ This connector uses the Solace [Java API](http://docs.solace.com/Solace-Messagin
 When a Task starts it connects to a Solace Message Router (Appliance, VMR or MAAS) and creates a topic subscription. The `solace.topic` property may contain *wildcards* so that the connector can listen to a subset of the topics in a multi-level topic hierarchy, for example subscribing to *test/>* will match all topics which start with the element *test*. A forward slash '/' is used as the separator in topic names. A single star '\*' matches any string in that position eg *test/foo\*/update* See the [Solace Docs](http://docs.solace.com/Features/SMF-Topics.htm) for full details.
 
 The connector uses the API in synchronous mode to retrieve messages from the Solace Message Router. If no messages are available the connector's poll() method will block for `polling.long_interval` milliseconds. Once messages become available the connector assembles a vector of records containing `polling.batch_size` records which is passed to Kafka. If not enough messages to fill the vector are available and no further messages are received within `polling.short_interval` milliseconds the data is passed to Kafka in any case.
+
+### High Availabilty of the connector
+
+A Solace Topic uses publish subscribe semantics, which means that if this connector is configured to instantiate multiple tasks (```max.tasks``` greater than 1 in the properties file) are running they all will receive every message published, leading to duplicates being passed to the Kafka Topic.
+
+In order to avoid this and have only a single task instance passing data to Kafka the connector provides a High Availability concept which uses a Solace [Last Value Queue](https://docs.solace.com/Features/Endpoints.htm#LVQs) as a sentinel. 
+
+The name of the queue to use is set via the optional property ```solace.ha_sentinel_queue```. When this is set then the first task instance will become active (receive messages from Solace and pass them to Kafka). If the first task is stopped or dies the next will become active and so on.
+
+The connector attempts to provision the configured queue when it starts. This is only possible if the client profile used by the connector's identity has the "Guaranteed Endpoint Create" privilege.
+![](docs/images/GuaranteedEndpointCreate.png) 
+  
+The sentinel queue may of course also be created administratively in which case the identity used by the connector should be set to be the queue owner.
 
 ## Authors
 
