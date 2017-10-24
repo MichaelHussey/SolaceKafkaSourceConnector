@@ -46,11 +46,11 @@ public class HASentinel implements XMLMessageListener, JCSMPStreamingPublishEven
 			throw new ConnectException("Cannot create HA Sentinel as no HA Queue Name defined.");
 		}
 		haQueue = connectHAQ();
-		log.info("Provisioned HA Queue named %s on session %s", haQueueName, session.getSessionName());
+		log.info("Provisioned HA Queue named {} on session {}", haQueueName, session.getSessionName());
 	}
 
 	protected Queue connectHAQ() throws JCSMPException {
-        log.debug("Attempting to provision the queue '%s' on the appliance", haQueueName);
+        log.debug("Attempting to provision the queue '{}' on the appliance", haQueueName);
         
         final EndpointProperties endpointProps = new EndpointProperties();
         
@@ -109,13 +109,13 @@ public class HASentinel implements XMLMessageListener, JCSMPStreamingPublishEven
 
 	@Override
 	public void handleError(String arg0, JCSMPException arg1, long arg2) {
-		log.warn("Error received when sending sentinel heartbeat %s %i %s",arg0, arg2, arg1.getMessage());
+		log.warn("Error received when sending sentinel heartbeat {} {} {}",arg0, arg2, arg1.getMessage());
 		
 	}
 
 	@Override
 	public void responseReceived(String arg0) {
-		log.info("Response when sending Sentinel Heartbeat: %s", arg0);
+		log.info("Response when sending Sentinel Heartbeat: {}", arg0);
 	}
 
 	public void start()  throws JCSMPException {
