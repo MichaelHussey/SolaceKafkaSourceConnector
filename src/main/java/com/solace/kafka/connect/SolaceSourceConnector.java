@@ -52,10 +52,11 @@ public class SolaceSourceConnector extends SourceConnector {
 	public List<Map<String, String>> taskConfigs(int maxTasks) {
 		ArrayList<Map<String, String>> configs = new ArrayList<Map<String, String>>();
 		
-		// TODO - does it make sense to allow more than one task when listening to topics?
 	 	for (int i=0; i<maxTasks; i++)
 		{
 	 		Map<String, String> config = new HashMap<String, String>(connectorProperties);
+	 		config.put(SolaceConnectorConstants.CONNECTOR_INSTANCE, 
+	 				SolaceConnectorConstants.CONNECTOR_NAME+"_"+SolaceConnectorConstants.CONNECTOR_VERSION+"_"+i);
 		    configs.add(config);
 		}
 	    return configs;

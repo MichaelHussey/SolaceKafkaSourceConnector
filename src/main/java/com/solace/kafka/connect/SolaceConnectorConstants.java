@@ -9,6 +9,7 @@ public class SolaceConnectorConstants {
 	
 	public static final String CONNECTOR_NAME = "solace_kafka_source";
 	public static final String CONNECTOR_VERSION = "0.1";
+	public static final String CONNECTOR_INSTANCE = "connector.instance";
 
 	public static final String SOLACE_VPN = "solace.msgVpn";
 	
@@ -19,6 +20,8 @@ public class SolaceConnectorConstants {
 	public static final String SOLACE_URL = "solace.smfHost";
 	
 	public static final String SOLACE_TOPIC = "solace.topic";
+	
+	public static final String SOLACE_HA_QUEUE = "solace.ha_sentinel_queue";
 	
 	public static final String SOLACE_RECONNECT_RETRIES = "solace.reconnectRetries";
 	public static final int DEFAULT_SOLACE_RECONNECT_RETRIES = 3;

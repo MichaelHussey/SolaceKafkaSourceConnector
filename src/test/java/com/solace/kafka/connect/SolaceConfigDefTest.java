@@ -65,5 +65,30 @@ public class SolaceConfigDefTest {
 		}
 		
 	}
+	@Test
+	public void testHAOn() {
+		Properties propMap = readMinProperties();
+		propMap.put("tasks.max", 1);
+		
+		try {
+			// when tasks=1 then we ignore HA queue
+			Map<String, Object> parsedMap = SolaceConfigDef.defaultConfig().parse(propMap);
+			
+			String qName = (String) parsedMap.get(SolaceConnectorConstants.SOLACE_HA_QUEUE);
+		} catch (ConfigException ce) {
+			ce.printStackTrace();
+		}
+		try {
+			// when tasks>1 then we require HA queue
+			propMap.put("tasks.max", 2);
+			Map<String, Object> parsedMap = SolaceConfigDef.defaultConfig().parse(propMap);
+			
+			String qName = (String) parsedMap.get(SolaceConnectorConstants.SOLACE_HA_QUEUE);
+			assertNotNull(qName);
+		} catch (ConfigException ce) {
+			ce.printStackTrace();
+		}
+		
+	}
 
 }

@@ -68,6 +68,16 @@ public class SolaceConfigDef extends AbstractConfig
 						Width.LONG,
 						null
 						)
+				.define(SolaceConnectorConstants.SOLACE_HA_QUEUE, 
+						Type.STRING, 
+						null, 
+						ConfigDef.Importance.MEDIUM, 
+						"Name of Queue to use as High-Availability sentinel",
+						SOLACE_GROUP, 
+						4,
+						Width.LONG,
+						null
+						)
 		// Reconnect related parameters
 				.define(SolaceConnectorConstants.SOLACE_RECONNECT_RETRIES, 
 						Type.INT, 
@@ -101,6 +111,15 @@ public class SolaceConfigDef extends AbstractConfig
 						Width.LONG,
 						null)
 		// Internal parameters
+				.define(SolaceConnectorConstants.CONNECTOR_INSTANCE, 
+						Type.STRING, 
+						SolaceConnectorConstants.CONNECTOR_NAME+"_"+SolaceConnectorConstants.CONNECTOR_VERSION+"_0",
+						ConfigDef.Importance.LOW, 
+						"Unique identifier for the particular instance of the Connector Task. Should not be set in config file.",
+						INTERNAL_GROUP, 
+						1,
+						Width.NONE,
+						null)
 				.define(SolaceConnectorConstants.KAFKA_TOPIC, 
 						Type.STRING, 
 						"solace_topic",
