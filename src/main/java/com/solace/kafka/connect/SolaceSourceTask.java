@@ -71,7 +71,7 @@ public class SolaceSourceTask extends SourceTask {
 		return haSentinelQueueName;
 	}
 
-	protected HASentinel haSentinel;
+	protected HASentinel haSentinel = null;
 
 	@Override
 	public String version() {
@@ -92,7 +92,7 @@ public class SolaceSourceTask extends SourceTask {
 		log.debug(instanceName+" in poll()");
 
 		ArrayList<SourceRecord> records = new ArrayList<SourceRecord>();
-		if(haSentinel != null && haSentinel.isActiveMember()) {
+		if(haSentinel != null && haSentinel.isActiveMember() || haSentinel == null) {
 
 			try {
 				BytesXMLMessage msg = consumer.receive(longPollInterval);
