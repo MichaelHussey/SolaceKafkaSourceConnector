@@ -30,6 +30,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 /**
+ * Test the Solace side of the Connector (doesn't send any data to Kafka).
  * @author michussey
  *
  */
@@ -82,7 +83,7 @@ public class SolaceSourceTaskTest implements Runnable {
 		
 		try {
 			
-			doSolaceREST();
+			RESTHelper.doSolaceREST(config, "test/foo", false);
 			
 			records = task.poll();
 			
@@ -124,53 +125,6 @@ public class SolaceSourceTaskTest implements Runnable {
 	}
 
 	
-	/**
-	 * @throws IOException 
-	 * @throws MalformedURLException 
-	 * @throws  
-	 * 
-	 */
-	public int doSolaceREST() throws MalformedURLException, IOException {
-		URL url = new URL(config.get("REST_URL")+"/TOPIC/test/foo");
-	    Map<String,Object> params = new LinkedHashMap<String,Object>();
-	    params.put("param1", "value1");
-	    params.put("param2", "value2");
-
-	    StringBuilder postData = new StringBuilder();
-	    for (Map.Entry<String,Object> param : params.entrySet()) {
-	        if (postData.length() != 0) postData.append('&');
-	        postData.append(URLEncoder.encode(param.getKey(), "UTF-8"));
-	        postData.append('=');
-	        postData.append(URLEncoder.encode(String.valueOf(param.getValue()), "UTF-8"));
-	    }
-	    String urlParameters = postData.toString();
-	    URLConnection conn = url.openConnection();
-
-	    conn.setDoOutput(true);
-	    
-	    // DataGo uses Basic Auth
-	    String authString = config.get(SolaceConnectorConstants.SOLACE_USERNAME)+":"+config.get(SolaceConnectorConstants.SOLACE_PASSWORD);
-	    String encodedAuth = Base64.getEncoder().encodeToString(authString.getBytes());
-	    conn.setRequestProperty  ("Authorization", "Basic " + encodedAuth);
-	    
-	    OutputStreamWriter writer = new OutputStreamWriter(conn.getOutputStream());
-
-	    writer.write("");
-	    writer.write(urlParameters);
-	    writer.flush();
-
-	    String result = "";
-	    String line;
-	    BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-
-	    while ((line = reader.readLine()) != null) {
-	        result += line;
-	    }
-	    writer.close();
-	    reader.close();
-	    System.out.println(result);
-		return 0;
-	}
 	
 	/** 
 	 * To make debugging easier
