@@ -10,7 +10,7 @@ These instructions will get you a copy of the project up and running on your loc
 
 ZooKeeper and Kafka.You need both a Solace Message Router and a Kafka environment. 
 
-If you don't have a physical Solace Appliance available to you then use either a Virtual Message Router [VMR](http://dev.solace.com/downloads/) or register on [Solace's messaging as a service](https://datago.io).
+If you don't have a physical Solace Appliance available to you then use either a Virtual Message Router [VMR](http://dev.solace.com/downloads/) or register on [Solace Cloud](https://cloud.solace.com).
 
 In order to connect to the Solace message router you need a number of parameters
 
