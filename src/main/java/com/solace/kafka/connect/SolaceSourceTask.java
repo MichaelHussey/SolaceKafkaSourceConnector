@@ -113,11 +113,11 @@ public class SolaceSourceTask extends SourceTask {
 			} catch (JCSMPException e) {
 				e.printStackTrace();
 			}
-			log.info("poll() found "+records.size()+" records");
+			log.info("{} poll() found {} records",instanceName,records.size());
 			return records;
 		}
 		else  {
-			log.debug(instanceName+" poll() not active ");
+			log.debug("{} poll() not active ",instanceName);
 			Thread.sleep(longPollInterval);
 			return records;
 		}
@@ -145,8 +145,10 @@ public class SolaceSourceTask extends SourceTask {
 		// Consume messages synchronously
 		converter = new SolaceConverter(this);
 		try {
-			consumer = session.getMessageConsumer((XMLMessageListener)null);
-			session.addSubscription(topic);
+			if (consumer == null) {
+				consumer = session.getMessageConsumer((XMLMessageListener)null);
+				session.addSubscription(topic);
+			}
 			consumer.start();
 		} catch (JCSMPException e) {
 			// TODO Auto-generated catch block
