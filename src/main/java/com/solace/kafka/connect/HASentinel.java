@@ -8,6 +8,9 @@ import com.solacesystems.jcsmp.BytesXMLMessage;
 import com.solacesystems.jcsmp.ConsumerFlowProperties;
 import com.solacesystems.jcsmp.DeliveryMode;
 import com.solacesystems.jcsmp.EndpointProperties;
+import com.solacesystems.jcsmp.FlowEvent;
+import com.solacesystems.jcsmp.FlowEventArgs;
+import com.solacesystems.jcsmp.FlowEventHandler;
 import com.solacesystems.jcsmp.FlowReceiver;
 import com.solacesystems.jcsmp.JCSMPException;
 import com.solacesystems.jcsmp.JCSMPFactory;
@@ -18,7 +21,7 @@ import com.solacesystems.jcsmp.Queue;
 import com.solacesystems.jcsmp.XMLMessageListener;
 import com.solacesystems.jcsmp.XMLMessageProducer;
 
-public class HASentinel implements XMLMessageListener, JCSMPStreamingPublishEventHandler {
+public class HASentinel implements XMLMessageListener, JCSMPStreamingPublishEventHandler, FlowEventHandler {
 	
 	private static final Logger log = LoggerFactory.getLogger(HASentinel.class);
 	
@@ -74,15 +77,18 @@ public class HASentinel implements XMLMessageListener, JCSMPStreamingPublishEven
         final ConsumerFlowProperties flow_prop = new ConsumerFlowProperties();
         flow_prop.setEndpoint(haQueue);
         flow_prop.setAckMode(JCSMPProperties.SUPPORTED_MESSAGE_ACK_CLIENT);
+        // magic flag so that we're notified when we become active
+        flow_prop.setActiveFlowIndication(true);
 
         EndpointProperties endpoint_props = new EndpointProperties();
         endpoint_props.setAccessType(EndpointProperties.ACCESSTYPE_EXCLUSIVE);
 
-        consumer = session.createFlow(this, flow_prop, endpoint_props);
+        consumer = session.createFlow(this, flow_prop, endpoint_props, this);
         
         consumer.start();  
 	}
 	
+	/**
 	protected void sendHeartbeat() throws JCSMPException {
 		XMLMessageProducer prod = session.getMessageProducer(this);
 		BytesXMLMessage hbMessage = JCSMPFactory.onlyInstance().createMessage(BytesXMLMessage.class);
@@ -91,7 +97,7 @@ public class HASentinel implements XMLMessageListener, JCSMPStreamingPublishEven
 		
 		log.info("Sent HA heartbeat");
 	}
-	
+	*/
 	
 
 	@Override
@@ -114,12 +120,12 @@ public class HASentinel implements XMLMessageListener, JCSMPStreamingPublishEven
 	}
 
 	@Override
-	public void responseReceived(String arg0) {
-		log.info("Response when sending Sentinel Heartbeat: {}", arg0);
+	public void responseReceived(String messageID) {
+		log.info("Successfully published Sentinel Heartbeat with message id {}", messageID);
 	}
 
 	public void start()  throws JCSMPException {
-		sendHeartbeat();
+		//sendHeartbeat();
 		if (consumer == null)
 			startListening();
 		else
@@ -129,17 +135,34 @@ public class HASentinel implements XMLMessageListener, JCSMPStreamingPublishEven
 	
 	public void stop()  throws JCSMPException {
 		consumer.stop();
+		consumer.close();
+		consumer = null;
 		
 		// Send a HB so that the next member of the group can become active
-		sendHeartbeat();
+		//sendHeartbeat();
 		isActiveMember = false;
 		isStopped = true;
 	}
+	/**
 	public void close()  throws JCSMPException {
 		if (!isStopped )
 			stop();
 		consumer.close();
 		consumer = null;
+	}/
+
+	/**
+	 * From FlowEventHandler
+	 */
+	@Override
+	public void handleEvent(Object source, FlowEventArgs event) {
+		log.info("Received event on Flow:"+source+" "+event);
+		if (event.getEvent() == FlowEvent.FLOW_ACTIVE) {
+			isActiveMember = true;
+		}
+		if (event.getEvent() == FlowEvent.FLOW_INACTIVE) {
+			isActiveMember = false;
+		}
 	}
 
 }

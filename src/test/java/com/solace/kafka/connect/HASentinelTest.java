@@ -83,7 +83,7 @@ public class HASentinelTest {
 			Thread.sleep(2000);
 			assertTrue(sen1.isActiveMember);
 
-			sen1.close();
+			sen1.stop();
 		} catch (JCSMPException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -122,17 +122,14 @@ public class HASentinelTest {
 			e.printStackTrace();
 		}
 
-		assertTrue(sen1.isActiveMember);
-		assertTrue(!sen2.isActiveMember);
+		assertTrue(sen1.isActiveMember != sen2.isActiveMember);
 
 		try {
 			sen1.stop();
-			sen1.close();
 			
 			Thread.sleep(2000);
 			assertTrue(sen2.isActiveMember);
 			sen2.stop();
-			sen2.close();
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

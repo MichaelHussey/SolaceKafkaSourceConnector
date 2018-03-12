@@ -20,6 +20,8 @@ import com.solacesystems.jcsmp.JCSMPProperties;
 import com.solacesystems.jcsmp.JCSMPReconnectEventHandler;
 import com.solacesystems.jcsmp.JCSMPSession;
 import com.solacesystems.jcsmp.Queue;
+import com.solacesystems.jcsmp.SessionEventArgs;
+import com.solacesystems.jcsmp.SessionEventHandler;
 import com.solacesystems.jcsmp.Topic;
 import com.solacesystems.jcsmp.XMLMessageConsumer;
 import com.solacesystems.jcsmp.XMLMessageListener;
@@ -28,7 +30,7 @@ import com.solacesystems.jcsmp.EndpointProperties;
 import com.solacesystems.jcsmp.JCSMPChannelProperties;
 
 
-public class SolaceSourceTask extends SourceTask {
+public class SolaceSourceTask extends SourceTask implements SessionEventHandler {
 
 	private static final Logger log = LoggerFactory.getLogger(SolaceSourceTask.class);
 
@@ -210,7 +212,7 @@ public class SolaceSourceTask extends SourceTask {
 
 		log.info("Connecting to Solace Message Router...");
 		topic = JCSMPFactory.onlyInstance().createTopic(solaceTopicName);
-		session = JCSMPFactory.onlyInstance().createSession(properties);
+		session = JCSMPFactory.onlyInstance().createSession(properties, null, this);
 		session.connect();		
 		log.info("Connection succeeded!");
 
@@ -221,6 +223,11 @@ public class SolaceSourceTask extends SourceTask {
 			haSentinel.start();
 		}
 
+	}
+
+	@Override
+	public void handleEvent(SessionEventArgs arg0) {
+		log.info("Received event on Session:"+arg0.getResponseCode()+" "+arg0.getInfo());
 	}
 
 }

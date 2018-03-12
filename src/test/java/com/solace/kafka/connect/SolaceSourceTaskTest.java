@@ -40,8 +40,8 @@ public class SolaceSourceTaskTest implements Runnable {
 	private SolaceSourceTask task;
 
 	/**
-	 * It's a good idea to use DataGo service for the messaging server during the unit tests.
-	 * Register on http://datago.io/, or download a VMR from http://dev.solace.com/downloads/
+	 * It's a good idea to use a Solace Cloud service for the messaging server during the unit tests.
+	 * Register on http://cloud.solace.com/, or download a VMR from http://dev.solace.com/downloads/
 	 *  
 	 */
     @Before

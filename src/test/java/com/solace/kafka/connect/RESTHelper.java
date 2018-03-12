@@ -64,8 +64,16 @@ public class RESTHelper {
 	    }
 	    writer.close();
 	    reader.close();
-	    System.err.println(result);
+	    //System.err.println(result);
 		return 0;
+	}
+	
+	
+	public static int getConnectorStatus(Properties config) {
+		String baseUrl = config.getProperty("REST_URL");
+		
+		return 0;
+
 	}
 	
 	
