@@ -27,6 +27,10 @@ repositories {
     mavenCentral()
 }
 
+tasks.withType(Test)  { 
+	systemProperties['CONFLUENCE_HOME'] = System.getProperty('CONFLUENCE_HOME', '/Users/michussey/Downloads/confluent-3.2.2')
+}
+
 dependencies {
 	// https://mvnrepository.com/artifact/org.apache.kafka/connect-api
 	compile group: 'org.apache.kafka', name: 'connect-api', version: '0.11.0.0'   
@@ -44,10 +48,16 @@ dependencies {
 	compile group: 'commons-lang', name: 'commons-lang', version: '2.6'
 
 	// https://mvnrepository.com/artifact/junit/junit
-	testCompile group: 'junit', name: 'junit', version: '4.12'
+	testCompile group: 'junit', name: 'junit', version: '4.+'
 
 	// https://mvnrepository.com/artifact/org.apache.kafka/connect-json
 	testCompile group: 'org.apache.kafka', name: 'connect-json', version: '0.11.0.0'
+
+	// https://mvnrepository.com/artifact/org.apache.kafka/runtime
+	testCompile group: 'org.apache.kafka', name: 'connect-runtime', version: '0.11.0.0'
+
+	// https://mvnrepository.com/artifact/com.google.code.gson/gson
+	testCompile group: 'com.google.code.gson', name: 'gson', version: '2.8.2'
 
 	// Solace Messaging API for Java Dependencies
 	compile("com.solacesystems:sol-jcsmp:10.+")
