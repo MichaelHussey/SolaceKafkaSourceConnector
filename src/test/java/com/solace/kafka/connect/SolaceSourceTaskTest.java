@@ -108,6 +108,8 @@ public class SolaceSourceTaskTest implements Runnable {
 		assertTrue(jsonData.length > 0);
 		
 		System.err.println("JSON data: "+new String(jsonData));
+		
+		task.stop();
 	}
 	
 	/**
@@ -122,6 +124,8 @@ public class SolaceSourceTaskTest implements Runnable {
 		
 		assertEquals(task.reconnectRetries, SolaceConnectorConstants.DEFAULT_SOLACE_RECONNECT_RETRIES);
 		assertEquals(task.reconnectRetryWaitInMillis, SolaceConnectorConstants.DEFAULT_SOLACE_RECONNECT_RETRY_WAIT);
+		
+		task.stop();
 	}
 
 	
