@@ -183,8 +183,14 @@ public class SolaceSourceTask extends SourceTask implements SessionEventHandler 
 
 	@Override
 	public void stop() {
-		consumer.close();
-		session.closeSession();
+		if (consumer != null)
+		{
+			consumer.close();
+		}
+		if (session != null) 
+		{
+			session.closeSession();
+		}
 	}
 
 	public void connect() throws JCSMPException {
@@ -218,8 +224,7 @@ public class SolaceSourceTask extends SourceTask implements SessionEventHandler 
 
 		if (haSentinelQueueName != null)
 		{
-			haSentinel = new HASentinel(session, haSentinelQueueName);
-			haSentinel.connect();
+			haSentinel = new HASentinel(instanceName, session, haSentinelQueueName);
 			haSentinel.start();
 		}
 
