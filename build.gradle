@@ -48,7 +48,7 @@ dependencies {
 	compile group: 'commons-lang', name: 'commons-lang', version: '2.6'
 
 	// https://mvnrepository.com/artifact/junit/junit
-	testCompile group: 'junit', name: 'junit', version: '4.+'
+	testCompile group: 'junit', name: 'junit', version: '4.13.1+'
 
 	// https://mvnrepository.com/artifact/org.apache.kafka/connect-json
 	testCompile group: 'org.apache.kafka', name: 'connect-json', version: '0.11.0.0'
